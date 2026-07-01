@@ -1,0 +1,32 @@
+## Ignore Visual Studio temporary files, build results, and user settings
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+x64/
+x86/
+build/
+bin/
+obj/
+
+# Visual Studio cache and settings
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# NuGet Packages
+*.nuget.props
+*.nuget.targets
+packages/
+
+# Rider / JetBrains
+.idea/
+
+# VS Code
+.vscode/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
