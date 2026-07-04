@@ -102,7 +102,10 @@ namespace TechStore.Formularios
 
             try
             {
-                var usuario = _servicioAutenticacion.Autenticar(txtUsuario.Text, txtContrasena.Text);
+                if (!ValidarYPrepararCampos(out string usuarioInput, out string contrasenaInput))
+                    return;
+
+                var usuario = _servicioAutenticacion.Autenticar(usuarioInput, contrasenaInput);
 
                 if (usuario != null)
                 {
@@ -131,6 +134,51 @@ namespace TechStore.Formularios
                     btnIngresar.Enabled = false;
                 }
             }
+        }
+
+        private bool ValidarYPrepararCampos(out string usuario, out string contrasena)
+        {
+            usuario = txtUsuario.Text ?? string.Empty;
+            contrasena = txtContrasena.Text ?? string.Empty;
+
+            var usuarioTrim = usuario.Trim();
+            var contrasenaTrim = contrasena.Trim();
+
+            if (string.IsNullOrWhiteSpace(usuarioTrim))
+            {
+                lblError.Text = "El campo Usuario no puede estar vacío.";
+                lblError.Visible = true;
+                usuario = usuarioTrim;
+                contrasena = contrasenaTrim;
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(contrasenaTrim))
+            {
+                lblError.Text = "El campo Contraseña no puede estar vacío.";
+                lblError.Visible = true;
+                usuario = usuarioTrim;
+                contrasena = contrasenaTrim;
+                return false;
+            }
+
+            // Evitar espacios internos en el nombre de usuario (no necesarios)
+            if (usuarioTrim.Contains(" "))
+            {
+                lblError.Text = "El usuario no debe contener espacios.";
+                lblError.Visible = true;
+                usuario = usuarioTrim;
+                contrasena = contrasenaTrim;
+                return false;
+            }
+
+            // Asignar valores "limpios" y actualizar UI
+            usuario = usuarioTrim;
+            contrasena = contrasenaTrim;
+            txtUsuario.Text = usuario;
+            txtContrasena.Text = contrasena;
+
+            return true;
         }
     }
 }
