@@ -245,8 +245,18 @@ namespace TechStore.Formularios
             btnDelete.FlatStyle = FlatStyle.Flat;
             dgvCarrito.Columns.Add(btnDelete);
 
-            decimal total = carrito.Sum(d => d.Subtotal);
-            lblTotal.Text = $"TOTAL: S/ {total:0.00}";
+            //decimal total = carrito.Sum(d => d.Subtotal);
+            //lblTotal.Text = $"TOTAL: S/ {total:0.00}";
+            decimal totalBruto = carrito.Sum(d => d.Subtotal);
+            decimal descuento = 0m;
+            if (_clienteId > 0 && lstClientes.SelectedItem is ComboBoxItem itemC)
+            {
+                var cliente = (Cliente)itemC.Value;
+                descuento = CalcularDescuentoVip(totalBruto, cliente);
+            }
+            decimal totalFinal = totalBruto - descuento;
+            lblTotal.Text = $"TOTAL: S/ {totalFinal:0.00}";
+
         }
 
         private void DgvCarrito_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -311,13 +321,28 @@ namespace TechStore.Formularios
         {
             try
             {
-                Venta venta = new Venta
+                /*Venta venta = new Venta
                 {
                     ClienteId = _clienteId,
                     UsuarioId = SesionActual.Usuario?.Id ?? 1,
                     Total = carrito.Sum(d => d.Subtotal),
                     Detalles = carrito
+                };*/
+                decimal totalBruto = carrito.Sum(d => d.Subtotal);
+                decimal descuentoVenta = 0m;
+                if (_clienteId > 0 && lstClientes.SelectedItem is ComboBoxItem itemC)
+                {
+                    var cliente = (Cliente)itemC.Value;
+                    descuentoVenta = CalcularDescuentoVip(totalBruto, cliente);
+                }
+                Venta venta = new Venta
+                {
+                    ClienteId = _clienteId,
+                    UsuarioId = SesionActual.Usuario?.Id ?? 1,
+                    Total = totalBruto - descuentoVenta, // Descuento aplicado
+                    Detalles = carrito
                 };
+
 
                 int idVenta = _servicioVenta.RegistrarVenta(venta);
                 string numeroFactura = $"FAC-{DateTime.Now.Year}-{idVenta:D6}";
@@ -341,5 +366,32 @@ namespace TechStore.Formularios
             public object Value { get; set; }
             public override string ToString() => Text;
         }
+
+        //mejora-ventas
+        private decimal CalcularDescuentoVip(decimal subtotalNeto, Cliente cliente)
+        {
+            decimal porcentajeDescuento = 0.0m;
+            string nombreUpper = cliente.Nombre.ToUpper();
+            string correoUpper = string.IsNullOrEmpty(cliente.Correo) ? "" : cliente.Correo.ToUpper();
+            bool esVip = nombreUpper.Contains("VIP") || correoUpper.Contains("VIP");
+            if (esVip)
+            {
+                porcentajeDescuento = 0.15m;
+            }
+            else if (subtotalNeto > 1000m)
+            {
+                porcentajeDescuento = 0.05m;
+            }
+            decimal descuentoAplicado = subtotalNeto * porcentajeDescuento;
+            if (descuentoAplicado > 0)
+            {
+                MessageBox.Show($"Se ha aplicado un descuento de S/ {descuentoAplicado:0.00} al cliente por ser VIP.", "Descuento Aplicado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            return descuentoAplicado;
+        }
+
+
+
+
     }
 }
