@@ -276,6 +276,7 @@ namespace TechStore.Formularios
 
         private void LimpiarCarrito()
         {
+            LimpiarTodoElFormulario();
             carrito.Clear();
             ActualizarCarrito();
             ValidarConfirmacion();
@@ -347,8 +348,7 @@ namespace TechStore.Formularios
                 int idVenta = _servicioVenta.RegistrarVenta(venta);
                 string numeroFactura = $"FAC-{DateTime.Now.Year}-{idVenta:D6}";
                 MessageBox.Show($"Venta registrada.\nFactura: {numeroFactura}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                txtBuscarCliente.Text = "";
-                txtBuscarProducto.Text = "";
+                LimpiarTodoElFormulario();
                 LimpiarCarrito();
                 _clienteId = 0;
                 lblClienteSeleccionado.Text = "Sin cliente seleccionado";
@@ -416,6 +416,30 @@ namespace TechStore.Formularios
             }
             return true;
         }
+        private void LimpiarTodoElFormulario()
+        {
+            carrito.Clear();
+            ActualizarCarrito();
+            productoActual = null;
+            _clienteId = 0;
+            txtBuscarProducto.Text = "";
+            txtBuscarProducto.ForeColor = Color.Gray;
+            lstProductos.Items.Clear();
+            lblNombreSeleccionado.Text = "-";
+            lblPrecioSeleccionado.Text = "Precio: S/ 0.00";
+            lblStockDisponible.Text = "Stock: 0";
+            lblStockDisponible.ForeColor = Color.Black;
+            nudCantidad.Value = 1;
+            btnAgregar.Enabled = false;
+            txtBuscarCliente.Text = "Buscar por nombre o DNI...";
+            txtBuscarCliente.ForeColor = Color.Gray;
+            lstClientes.Items.Clear();
+            lblClienteSeleccionado.Text = "Sin cliente seleccionado";
+            lblClienteSeleccionado.ForeColor = Color.FromArgb(220, 38, 38);
+            btnConfirmarVenta.Enabled = false;
+        }
+
+
 
 
 
