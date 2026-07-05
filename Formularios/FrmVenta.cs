@@ -347,8 +347,12 @@ namespace TechStore.Formularios
 
                 int idVenta = _servicioVenta.RegistrarVenta(venta);
                 string numeroFactura = $"FAC-{DateTime.Now.Year}-{idVenta:D6}";
-                MessageBox.Show($"Venta registrada.\nFactura: {numeroFactura}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //MessageBox.Show($"Venta registrada.\nFactura: {numeroFactura}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
+                ImprimirSimuladorTicket(venta, numeroFactura);
                 LimpiarTodoElFormulario();
+
+                
                 LimpiarCarrito();
                 _clienteId = 0;
                 lblClienteSeleccionado.Text = "Sin cliente seleccionado";
@@ -438,6 +442,54 @@ namespace TechStore.Formularios
             lblClienteSeleccionado.ForeColor = Color.FromArgb(220, 38, 38);
             btnConfirmarVenta.Enabled = false;
         }
+
+        private void ImprimirSimuladorTicket(Venta ventaGenerada, string numeroFactura)
+        {
+            var ticketBuilder = new System.Text.StringBuilder();
+            string lineaSeparadora = new string('-', 45);
+            string lineaDoble = new string('=', 39);
+            ticketBuilder.AppendLine(lineaDoble);
+            ticketBuilder.AppendLine("           TECHSTORE S.A.C.           ");
+            ticketBuilder.AppendLine("      RUC: 20123456789 - LIMA         ");
+            ticketBuilder.AppendLine(lineaDoble);
+            ticketBuilder.AppendLine($"Nro. Ticket: {numeroFactura}");
+            ticketBuilder.AppendLine($"Fecha: {DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")}");
+            ticketBuilder.AppendLine($"Cliente: {lblClienteSeleccionado.Text}");
+            ticketBuilder.AppendLine(lineaSeparadora);
+            ticketBuilder.AppendLine(string.Format("{0,-20} {1,6} {2,15}", "DESCRIPCION", "CANT", "IMPORTE"));
+            ticketBuilder.AppendLine(lineaSeparadora);
+            foreach (var detalle in ventaGenerada.Detalles)
+            {
+                var prodName = _servicioProducto.ObtenerTodos().FirstOrDefault(p => p.Id == detalle.ProductoId)?.Nombre ?? "Producto";
+                if (prodName.Length > 18)
+                {
+                    prodName = prodName.Substring(0, 18) + ".";
+                }
+                string importeStr = $"S/ {detalle.Subtotal:0.00}";
+                ticketBuilder.AppendLine(string.Format("{0,-20} {1,6} {2,15}", prodName, detalle.Cantidad, importeStr));
+            }
+            ticketBuilder.AppendLine(lineaSeparadora);
+            
+            decimal sumaSubtotales = ventaGenerada.Detalles.Sum(d => d.Subtotal);
+            decimal descuentoOtorgado = sumaSubtotales - ventaGenerada.Total;
+            ticketBuilder.AppendLine(string.Format("{0,-27} {1,15}", "TOTAL BRUTO:", $"S/ {sumaSubtotales:0.00}"));
+            if (descuentoOtorgado > 0)
+            {
+                ticketBuilder.AppendLine(string.Format("{0,-27} {1,15}", "DSCTO VIP:", $"-S/ {descuentoOtorgado:0.00}"));
+            }
+            decimal subtotalAntesIgv = ventaGenerada.Total / 1.18m;
+            decimal igvCalculado = ventaGenerada.Total - subtotalAntesIgv;
+            ticketBuilder.AppendLine(string.Format("{0,-27} {1,15}", "OP. GRAVADA:", $"S/ {subtotalAntesIgv:0.00}"));
+            ticketBuilder.AppendLine(string.Format("{0,-27} {1,15}", "IGV (18%):", $"S/ {igvCalculado:0.00}"));
+            ticketBuilder.AppendLine(lineaDoble);
+            ticketBuilder.AppendLine(string.Format("{0,-27} {1,15}", "TOTAL A PAGAR:", $"S/ {ventaGenerada.Total:0.00}"));
+            ticketBuilder.AppendLine(lineaDoble);
+            ticketBuilder.AppendLine("       GRACIAS POR SU COMPRA!         ");
+            ticketBuilder.AppendLine("       Vuelva pronto a TechStore      ");
+            MessageBox.Show(ticketBuilder.ToString(), "Impresión de Ticket", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+
 
 
 
