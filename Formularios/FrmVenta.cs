@@ -176,15 +176,15 @@ namespace TechStore.Formularios
         {
             if (productoActual == null || productoActual.Stock == 0) return;
             int cant = (int)nudCantidad.Value;
+            if (!ValidarStockSuficiente(productoActual, cant))
+            {
+                MessageBox.Show("No hay suficiente stock para la cantidad solicitada.");
+                    return;
+            }
             
             var existente = carrito.FirstOrDefault(d => d.ProductoId == productoActual.Id);
             if (existente != null)
             {
-                if (existente.Cantidad + cant > productoActual.Stock)
-                {
-                    MessageBox.Show("No hay suficiente stock para la cantidad solicitada.");
-                    return;
-                }
                 existente.Cantidad += cant;
                 existente.Subtotal = existente.Cantidad * existente.PrecioUnitario;
             }
@@ -347,7 +347,8 @@ namespace TechStore.Formularios
                 int idVenta = _servicioVenta.RegistrarVenta(venta);
                 string numeroFactura = $"FAC-{DateTime.Now.Year}-{idVenta:D6}";
                 MessageBox.Show($"Venta registrada.\nFactura: {numeroFactura}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                
+                txtBuscarCliente.Text = "";
+                txtBuscarProducto.Text = "";
                 LimpiarCarrito();
                 _clienteId = 0;
                 lblClienteSeleccionado.Text = "Sin cliente seleccionado";
@@ -390,6 +391,31 @@ namespace TechStore.Formularios
             return descuentoAplicado;
         }
 
+
+        private bool ValidarStockSuficiente(Producto producto, int cantidadRequerida)
+        {
+            int stockDisponible = producto.Stock;
+            var productoEnCarrito = carrito.FirstOrDefault(d => d.ProductoId == producto.Id);
+            int cantidadYaEnCarrito = 0;
+            if (productoEnCarrito != null)
+            {
+                cantidadYaEnCarrito = productoEnCarrito.Cantidad;
+            }
+            int cantidadTotalProyectada = cantidadYaEnCarrito + cantidadRequerida;
+            if (cantidadTotalProyectada > stockDisponible)
+            {
+                string mensajeAlerta = string.Format(
+                    "Stock insuficiente para completar esta acción.\n" +
+                    "Producto: {0}\n" +
+                    "Stock actual: {1}\n" +
+                    "En carrito: {2}\n" +
+                    "Intentando agregar: {3}",
+                    producto.Nombre, stockDisponible, cantidadYaEnCarrito, cantidadRequerida);
+                MessageBox.Show(mensajeAlerta, "Alerta de Stock", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+            return true;
+        }
 
 
 
