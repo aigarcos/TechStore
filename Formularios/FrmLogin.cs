@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using TechStore.Servicios.Implementaciones;
 using TechStore.Servicios.Interfaces;
@@ -55,7 +56,25 @@ namespace TechStore.Formularios
                 Location = new Point(50, 110),
                 Size = new Size(300, 30),
                 BorderStyle = BorderStyle.FixedSingle,
-                Font = new Font("Segoe UI", 10F)
+                Font = new Font("Segoe UI", 10F),
+                ForeColor = Color.Gray,
+                Text = "Ingrese su usuario"
+            };
+            txtUsuario.Enter += (s, e) =>
+            {
+                if (txtUsuario.Text == "Ingrese su usuario")
+                {
+                    txtUsuario.Text = string.Empty;
+                    txtUsuario.ForeColor = Color.Black;
+                }
+            };
+            txtUsuario.Leave += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(txtUsuario.Text))
+                {
+                    txtUsuario.Text = "Ingrese su usuario";
+                    txtUsuario.ForeColor = Color.Gray;
+                }
             };
 
             txtContrasena = new TextBox
@@ -64,7 +83,26 @@ namespace TechStore.Formularios
                 Size = new Size(300, 30),
                 BorderStyle = BorderStyle.FixedSingle,
                 Font = new Font("Segoe UI", 10F),
-                PasswordChar = '*'
+                ForeColor = Color.Gray,
+                Text = "Ingrese su contraseña"
+            };
+            txtContrasena.Enter += (s, e) =>
+            {
+                if (txtContrasena.Text == "Ingrese su contraseña")
+                {
+                    txtContrasena.Text = string.Empty;
+                    txtContrasena.ForeColor = Color.Black;
+                    txtContrasena.PasswordChar = '*';
+                }
+            };
+            txtContrasena.Leave += (s, e) =>
+            {
+                if (string.IsNullOrWhiteSpace(txtContrasena.Text))
+                {
+                    txtContrasena.Text = "Ingrese su contraseña";
+                    txtContrasena.ForeColor = Color.Gray;
+                    txtContrasena.PasswordChar = '\0';
+                }
             };
 
             btnIngresar = new Button
@@ -94,6 +132,24 @@ namespace TechStore.Formularios
             this.Controls.Add(txtContrasena);
             this.Controls.Add(btnIngresar);
             this.Controls.Add(lblError);
+
+            this.AcceptButton = btnIngresar;
+            txtUsuario.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    e.SuppressKeyPress = true;
+                    btnIngresar.PerformClick();
+                }
+            };
+            txtContrasena.KeyDown += (s, e) =>
+            {
+                if (e.KeyCode == Keys.Enter)
+                {
+                    e.SuppressKeyPress = true;
+                    btnIngresar.PerformClick();
+                }
+            };
         }
 
         private void BtnIngresar_Click(object sender, EventArgs e)
@@ -109,6 +165,8 @@ namespace TechStore.Formularios
 
                 if (usuario != null)
                 {
+                    RegistrarInicioSesionExitoso(usuario.NombreUsuario);
+
                     this.Hide();
                     // Resolvemos el FrmPrincipal a través de DI
                     var frmPrincipal = (FrmPrincipal)_serviceProvider.GetService(typeof(FrmPrincipal));
@@ -133,6 +191,20 @@ namespace TechStore.Formularios
                 {
                     btnIngresar.Enabled = false;
                 }
+            }
+        }
+
+        private void RegistrarInicioSesionExitoso(string usuario)
+        {
+            try
+            {
+                string rutaLog = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "log.txt");
+                string linea = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {usuario}{Environment.NewLine}";
+                File.AppendAllText(rutaLog, linea);
+            }
+            catch
+            {
+                // No interrumpir el flujo si no se puede escribir el archivo.
             }
         }
 
