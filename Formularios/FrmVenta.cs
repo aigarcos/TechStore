@@ -9,7 +9,7 @@ using TechStore.Servicios.Implementaciones;
 
 namespace TechStore.Formularios
 {
-    public partial class FrmVenta : Form
+    public partial class FrmVenta : BaseForm
     {
         private readonly IServicioVenta _servicioVenta;
         private readonly IServicioProducto _servicioProducto;

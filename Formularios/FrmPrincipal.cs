@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace TechStore.Formularios
 {
-    public partial class FrmPrincipal : Form
+    public partial class FrmPrincipal : BaseForm
     {
         private readonly IServicioVenta _servicioVenta;
         private readonly IServicioProducto _servicioProducto;
@@ -24,6 +24,9 @@ namespace TechStore.Formularios
         private ToolStripStatusLabel statusUser;
         private ToolStripStatusLabel statusDate;
         private Timer timer;
+        private Button btnAumentarTexto;
+        private Button btnDisminuirTexto;
+        private Label lblEscalaTexto;
 
         public FrmPrincipal(IServicioVenta servicioVenta, IServicioProducto servicioProducto, IServicioCMDB servicioCMDB, IServiceProvider serviceProvider)
         {
@@ -70,6 +73,41 @@ namespace TechStore.Formularios
             timer.Tick += (s, e) => statusDate.Text = DateTime.Now.ToString("g");
             timer.Start();
 
+            btnAumentarTexto = new Button
+            {
+                Text = "A+",
+                Location = new Point(740, 40),
+                Size = new Size(45, 28),
+                BackColor = Color.FromArgb(37, 99, 235),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
+            };
+            btnAumentarTexto.FlatAppearance.BorderSize = 0;
+            btnAumentarTexto.Click += (s, e) => AjustarTexto(10);
+
+            btnDisminuirTexto = new Button
+            {
+                Text = "A-",
+                Location = new Point(790, 40),
+                Size = new Size(45, 28),
+                BackColor = Color.FromArgb(100, 116, 139),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold)
+            };
+            btnDisminuirTexto.FlatAppearance.BorderSize = 0;
+            btnDisminuirTexto.Click += (s, e) => AjustarTexto(-10);
+
+            lblEscalaTexto = new Label
+            {
+                Text = "100%",
+                AutoSize = true,
+                Location = new Point(845, 45),
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(37, 99, 235)
+            };
+
             // Botón Refrescar
             var btnRefrescar = new Button
             {
@@ -82,6 +120,9 @@ namespace TechStore.Formularios
             };
             btnRefrescar.FlatAppearance.BorderSize = 0;
             btnRefrescar.Click += (s, e) => CargarDatosDashboard();
+            this.Controls.Add(btnAumentarTexto);
+            this.Controls.Add(btnDisminuirTexto);
+            this.Controls.Add(lblEscalaTexto);
             this.Controls.Add(btnRefrescar);
 
             // Tarjetas (Y = 80)
@@ -106,6 +147,15 @@ namespace TechStore.Formularios
             this.Controls.Add(dgvStockCritico);
             this.Controls.Add(lblGridCMDB);
             this.Controls.Add(dgvCMDB);
+
+            TextScaleHelper.Aplicar(this);
+            lblEscalaTexto.Text = $"{TextScaleHelper.CurrentScalePercent}%";
+        }
+
+        private void AjustarTexto(int delta)
+        {
+            TextScaleHelper.Ajustar(delta);
+            lblEscalaTexto.Text = $"{TextScaleHelper.CurrentScalePercent}%";
         }
 
         private Panel CrearTarjeta(string titulo, out Label valorLabel, Point location)

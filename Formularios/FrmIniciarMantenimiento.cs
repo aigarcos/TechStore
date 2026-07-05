@@ -5,7 +5,7 @@ using TechStore.Servicios.Interfaces;
 
 namespace TechStore.Formularios
 {
-    public partial class FrmIniciarMantenimiento : Form
+    public partial class FrmIniciarMantenimiento : BaseForm
     {
         private readonly IServicioCMDB _servicioCMDB;
         private readonly int _itemId;

@@ -26,11 +26,6 @@ namespace TechStore.Servicios.Implementaciones
             var usuario = _repositorio.ObtenerPorNombreUsuario(nombreUsuario);
             if (usuario == null) return null;
 
-            if (!usuario.Activo)
-            {
-                throw new Exception("Usuario bloqueado por demasiados intentos fallidos o dado de baja.");
-            }
-
             string hashIngresado = CalcularSHA256(contrasena);
 
             if (usuario.ContrasenaHash == hashIngresado)
@@ -43,10 +38,6 @@ namespace TechStore.Servicios.Implementaciones
             else
             {
                 usuario.IntentosFailidos++;
-                if (usuario.IntentosFailidos >= 3)
-                {
-                    usuario.Activo = false;
-                }
                 _repositorio.Actualizar(usuario);
                 return null;
             }

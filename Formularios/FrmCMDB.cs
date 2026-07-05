@@ -7,7 +7,7 @@ using TechStore.Modelos;
 
 namespace TechStore.Formularios
 {
-    public partial class FrmCMDB : Form
+    public partial class FrmCMDB : BaseForm
     {
         private readonly IServicioCMDB _servicioCMDB;
 

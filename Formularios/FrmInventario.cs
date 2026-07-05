@@ -7,7 +7,7 @@ using TechStore.Servicios.Interfaces;
 
 namespace TechStore.Formularios
 {
-    public partial class FrmInventario : Form
+    public partial class FrmInventario : BaseForm
     {
         private readonly IServicioProducto _servicioProducto;
         

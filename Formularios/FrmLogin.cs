@@ -7,7 +7,7 @@ using TechStore.Servicios.Interfaces;
 
 namespace TechStore.Formularios
 {
-    public partial class FrmLogin : Form
+    public partial class FrmLogin : BaseForm
     {
         private readonly IServicioAutenticacion _servicioAutenticacion;
         private readonly IServiceProvider _serviceProvider;
@@ -15,8 +15,11 @@ namespace TechStore.Formularios
         private TextBox txtUsuario;
         private TextBox txtContrasena;
         private Button btnIngresar;
+        private Button btnAumentarTexto;
+        private Button btnDisminuirTexto;
         private Label lblError;
         private Label lblIntentos;
+        private Label lblEscalaTexto;
 
         public FrmLogin(IServicioAutenticacion servicioAutenticacion, IServiceProvider serviceProvider)
         {
@@ -118,11 +121,46 @@ namespace TechStore.Formularios
             btnIngresar.FlatAppearance.BorderSize = 0;
             btnIngresar.Click += BtnIngresar_Click;
 
+            btnAumentarTexto = new Button
+            {
+                Text = "+",
+                Location = new Point(310, 250),
+                Size = new Size(40, 32),
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                BackColor = Color.FromArgb(37, 99, 235),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnAumentarTexto.FlatAppearance.BorderSize = 0;
+            btnAumentarTexto.Click += (s, e) => AjustarTexto(10);
+
+            btnDisminuirTexto = new Button
+            {
+                Text = "-",
+                Location = new Point(355, 250),
+                Size = new Size(40, 32),
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                BackColor = Color.FromArgb(100, 116, 139),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnDisminuirTexto.FlatAppearance.BorderSize = 0;
+            btnDisminuirTexto.Click += (s, e) => AjustarTexto(-10);
+
+            lblEscalaTexto = new Label
+            {
+                Text = "100%",
+                AutoSize = true,
+                Location = new Point(250, 257),
+                Font = new Font("Segoe UI", 10F, FontStyle.Bold),
+                ForeColor = Color.FromArgb(37, 99, 235)
+            };
+
             lblError = new Label
             {
                 ForeColor = Color.FromArgb(220, 38, 38), // Red error
                 AutoSize = true,
-                Location = new Point(50, 245),
+                Location = new Point(50, 180),
                 Visible = false
             };
 
@@ -131,7 +169,13 @@ namespace TechStore.Formularios
             this.Controls.Add(txtUsuario);
             this.Controls.Add(txtContrasena);
             this.Controls.Add(btnIngresar);
+            this.Controls.Add(btnAumentarTexto);
+            this.Controls.Add(btnDisminuirTexto);
+            this.Controls.Add(lblEscalaTexto);
             this.Controls.Add(lblError);
+
+            TextScaleHelper.Aplicar(this);
+            lblEscalaTexto.Text = $"{TextScaleHelper.CurrentScalePercent}%";
 
             this.AcceptButton = btnIngresar;
             txtUsuario.KeyDown += (s, e) =>
@@ -150,6 +194,12 @@ namespace TechStore.Formularios
                     btnIngresar.PerformClick();
                 }
             };
+        }
+
+        private void AjustarTexto(int delta)
+        {
+            TextScaleHelper.Ajustar(delta);
+            lblEscalaTexto.Text = $"{TextScaleHelper.CurrentScalePercent}%";
         }
 
         private void BtnIngresar_Click(object sender, EventArgs e)
@@ -187,10 +237,6 @@ namespace TechStore.Formularios
             {
                 lblError.Text = ex.Message;
                 lblError.Visible = true;
-                if (ex.Message.Contains("bloqueado"))
-                {
-                    btnIngresar.Enabled = false;
-                }
             }
         }
 

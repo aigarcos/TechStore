@@ -5,7 +5,7 @@ using TechStore.Servicios.Interfaces;
 
 namespace TechStore.Formularios
 {
-    public partial class FrmDarDeBaja : Form
+    public partial class FrmDarDeBaja : BaseForm
     {
         private readonly IServicioCMDB _servicioCMDB;
         private readonly int _itemId;
