@@ -17,6 +17,7 @@ namespace TechStore.Formularios
         private Button btnIngresar;
         private Button btnAumentarTexto;
         private Button btnDisminuirTexto;
+        private Button btnModoOscuro;
         private Label lblError;
         private Label lblIntentos;
         private Label lblEscalaTexto;
@@ -156,6 +157,19 @@ namespace TechStore.Formularios
                 ForeColor = Color.FromArgb(37, 99, 235)
             };
 
+            btnModoOscuro = new Button
+            {
+                Text = "Modo oscuro",
+                Location = new Point(20, 250),
+                Size = new Size(110, 32),
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                BackColor = Color.FromArgb(37, 99, 235),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnModoOscuro.FlatAppearance.BorderSize = 0;
+            btnModoOscuro.Click += (s, e) => TemaOscuroHelper.Alternar(this);
+
             lblError = new Label
             {
                 ForeColor = Color.FromArgb(220, 38, 38), // Red error
@@ -169,6 +183,7 @@ namespace TechStore.Formularios
             this.Controls.Add(txtUsuario);
             this.Controls.Add(txtContrasena);
             this.Controls.Add(btnIngresar);
+            this.Controls.Add(btnModoOscuro);
             this.Controls.Add(btnAumentarTexto);
             this.Controls.Add(btnDisminuirTexto);
             this.Controls.Add(lblEscalaTexto);

@@ -26,6 +26,7 @@ namespace TechStore.Formularios
         private Timer timer;
         private Button btnAumentarTexto;
         private Button btnDisminuirTexto;
+        private Button btnModoOscuro;
         private Label lblEscalaTexto;
 
         public FrmPrincipal(IServicioVenta servicioVenta, IServicioProducto servicioProducto, IServicioCMDB servicioCMDB, IServiceProvider serviceProvider)
@@ -108,6 +109,19 @@ namespace TechStore.Formularios
                 ForeColor = Color.FromArgb(37, 99, 235)
             };
 
+            btnModoOscuro = new Button
+            {
+                Text = "Modo oscuro",
+                Location = new Point(620, 40),
+                Size = new Size(110, 30),
+                Font = new Font("Segoe UI", 9F, FontStyle.Bold),
+                BackColor = Color.FromArgb(37, 99, 235),
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnModoOscuro.FlatAppearance.BorderSize = 0;
+            btnModoOscuro.Click += (s, e) => TemaOscuroHelper.Alternar(this);
+
             // Botón Refrescar
             var btnRefrescar = new Button
             {
@@ -120,6 +134,7 @@ namespace TechStore.Formularios
             };
             btnRefrescar.FlatAppearance.BorderSize = 0;
             btnRefrescar.Click += (s, e) => CargarDatosDashboard();
+            this.Controls.Add(btnModoOscuro);
             this.Controls.Add(btnAumentarTexto);
             this.Controls.Add(btnDisminuirTexto);
             this.Controls.Add(lblEscalaTexto);
