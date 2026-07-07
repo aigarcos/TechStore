@@ -153,10 +153,7 @@ namespace TechStore.Formularios
 
         private void TxtBuscar_TextChanged(object sender, EventArgs e)
         {
-            if (txtBuscar.Text != "Buscar por nombre o DNI...")
-            {
-                CargarClientes();
-            }
+            CargarClientes();
         }
 
         private void DgvClientes_CellClick(object sender, DataGridViewCellEventArgs e)
