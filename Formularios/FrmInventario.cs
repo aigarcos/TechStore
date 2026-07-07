@@ -225,6 +225,25 @@ namespace TechStore.Formularios
             CargarDatos();
         }
 
+        // Calcula el valor monetario total del inventario: suma de (Stock * Precio)
+        public decimal CalcularValorInventario()
+        {
+            try
+            {
+                var productos = _servicioProducto.ObtenerTodos();
+                decimal total = 0m;
+                foreach (var p in productos)
+                {
+                    total += p.Stock * p.Precio;
+                }
+                return total;
+            }
+            catch
+            {
+                return 0m;
+            }
+        }
+
         private void DgvProductos_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
