@@ -80,6 +80,7 @@ namespace TechStore.Formularios
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
             dgvProductos.CellClick += DgvProductos_CellClick;
+            dgvProductos.CellFormatting += DgvProductos_CellFormatting;
             this.Controls.Add(dgvProductos);
 
             // Panel Derecho (Edición)
@@ -207,6 +208,42 @@ namespace TechStore.Formularios
             }
         }
 
+        // Filtrado rápido por categoría desde código (ej: "Laptops", "Accesorios")
+        public void FiltrarPorCategoria(string categoria)
+        {
+            if (string.IsNullOrWhiteSpace(categoria)) return;
+            for (int i = 0; i < cmbCategoriaFiltro.Items.Count; i++)
+            {
+                if (cmbCategoriaFiltro.Items[i].ToString().Equals(categoria, StringComparison.OrdinalIgnoreCase))
+                {
+                    cmbCategoriaFiltro.SelectedIndex = i;
+                    CargarDatos();
+                    return;
+                }
+            }
+            cmbCategoriaFiltro.SelectedIndex = 0; // "Todos"
+            CargarDatos();
+        }
+
+        // Calcula el valor monetario total del inventario: suma de (Stock * Precio)
+        public decimal CalcularValorInventario()
+        {
+            try
+            {
+                var productos = _servicioProducto.ObtenerTodos();
+                decimal total = 0m;
+                foreach (var p in productos)
+                {
+                    total += p.Stock * p.Precio;
+                }
+                return total;
+            }
+            catch
+            {
+                return 0m;
+            }
+        }
+
         private void DgvProductos_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
@@ -223,6 +260,26 @@ namespace TechStore.Formularios
             }
         }
 
+        private void DgvProductos_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            try
+            {
+                if (e.RowIndex < 0) return;
+                var row = dgvProductos.Rows[e.RowIndex];
+                var cell = row.Cells["Stock"];
+                if (cell?.Value != null && int.TryParse(cell.Value.ToString(), out int stock))
+                {
+                    const int minimoPermitido = 5; // Ajustar según configuración
+                    if (stock < minimoPermitido)
+                    {
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(254, 226, 226);
+                        row.DefaultCellStyle.ForeColor = Color.FromArgb(220, 38, 38);
+                    }
+                }
+            }
+            catch { }
+        }
+
         private void BtnNuevo_Click(object sender, EventArgs e)
         {
             LimpiarFormulario();
@@ -233,7 +290,38 @@ namespace TechStore.Formularios
             _productoSeleccionadoId = 0;
             txtCodigo.Text = "";
             txtNombre.Text = "";
-            cmbCategoriaProducto.SelectedIndex = 0;
+                var codigoIngresado = txtCodigo.Text.Trim();
+                var nombreIngresado = txtNombre.Text.Trim();
+                var productosExistentes = _servicioProducto.ObtenerTodos();
+
+                // Verificar duplicados (cuando se crea uno nuevo se compara contra todos,
+                // cuando se edita se excluye el propio registro)
+                if (_productoSeleccionadoId == 0)
+                {
+                    if (productosExistentes.Any(p => p.Codigo.Equals(codigoIngresado, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("El código ingresado ya existe en otro producto.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    if (productosExistentes.Any(p => p.Nombre.Equals(nombreIngresado, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("El nombre ingresado ya existe en otro producto.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+                else
+                {
+                    if (productosExistentes.Any(p => p.Id != _productoSeleccionadoId && p.Codigo.Equals(codigoIngresado, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("El código ingresado ya existe en otro producto.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    if (productosExistentes.Any(p => p.Id != _productoSeleccionadoId && p.Nombre.Equals(nombreIngresado, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("El nombre ingresado ya existe en otro producto.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
             txtPrecio.Text = "";
             txtStock.Text = "";
             lblModoActual.Text = "Modo: Nuevo producto";
