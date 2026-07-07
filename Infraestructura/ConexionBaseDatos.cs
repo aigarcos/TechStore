@@ -8,7 +8,7 @@ namespace TechStore.Infraestructura
 
         public ConexionBaseDatos()
         {
-            _connectionString = @"Server=DESKTOP-G177510;Database=TechStore;Trusted_Connection=True;";
+            _connectionString = @"Server=localhost;Database=TechStore;Trusted_Connection=True;";
         }
 
         public SqlConnection ObtenerConexion()
