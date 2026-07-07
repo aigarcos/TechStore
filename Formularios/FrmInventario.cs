@@ -290,7 +290,38 @@ namespace TechStore.Formularios
             _productoSeleccionadoId = 0;
             txtCodigo.Text = "";
             txtNombre.Text = "";
-            cmbCategoriaProducto.SelectedIndex = 0;
+                var codigoIngresado = txtCodigo.Text.Trim();
+                var nombreIngresado = txtNombre.Text.Trim();
+                var productosExistentes = _servicioProducto.ObtenerTodos();
+
+                // Verificar duplicados (cuando se crea uno nuevo se compara contra todos,
+                // cuando se edita se excluye el propio registro)
+                if (_productoSeleccionadoId == 0)
+                {
+                    if (productosExistentes.Any(p => p.Codigo.Equals(codigoIngresado, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("El código ingresado ya existe en otro producto.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    if (productosExistentes.Any(p => p.Nombre.Equals(nombreIngresado, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("El nombre ingresado ya existe en otro producto.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
+                else
+                {
+                    if (productosExistentes.Any(p => p.Id != _productoSeleccionadoId && p.Codigo.Equals(codigoIngresado, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("El código ingresado ya existe en otro producto.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                    if (productosExistentes.Any(p => p.Id != _productoSeleccionadoId && p.Nombre.Equals(nombreIngresado, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        MessageBox.Show("El nombre ingresado ya existe en otro producto.", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+                }
             txtPrecio.Text = "";
             txtStock.Text = "";
             lblModoActual.Text = "Modo: Nuevo producto";
