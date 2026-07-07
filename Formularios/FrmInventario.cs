@@ -28,7 +28,7 @@ namespace TechStore.Formularios
         private Button btnGuardar, btnEliminar, btnCancelar;
 
         // Resumen
-        private Label lblTotalProductos, lblSinStock, lblStockBajo;
+        private Label lblTotalProductos, lblSinStock, lblStockBajo, lblValorInventario;
 
         public FrmInventario(IServicioProducto servicioProducto)
         {
@@ -125,10 +125,11 @@ namespace TechStore.Formularios
             // Resumen Inferior
             Panel pnlResumen = new Panel { Location = new Point(660, 470), Size = new Size(320, 60), BorderStyle = BorderStyle.FixedSingle };
             lblTotalProductos = new Label { Text = "Total: 0", Location = new Point(10, 10), AutoSize = true, Font = new Font("Segoe UI", 9F, FontStyle.Bold) };
+            lblValorInventario = new Label { Text = "Valor inventario: S/ 0.00", Location = new Point(150, 10), AutoSize = true, Font = new Font("Segoe UI", 9F, FontStyle.Bold) };
             lblSinStock = new Label { Text = "Sin stock: 0", Location = new Point(10, 35), AutoSize = true, Font = new Font("Segoe UI", 9F, FontStyle.Bold) };
             lblStockBajo = new Label { Text = "Stock bajo: 0", Location = new Point(150, 35), AutoSize = true, Font = new Font("Segoe UI", 9F, FontStyle.Bold) };
-            
-            pnlResumen.Controls.AddRange(new Control[] { lblTotalProductos, lblSinStock, lblStockBajo });
+
+            pnlResumen.Controls.AddRange(new Control[] { lblTotalProductos, lblValorInventario, lblSinStock, lblStockBajo });
             this.Controls.Add(pnlResumen);
         }
 
@@ -198,6 +199,14 @@ namespace TechStore.Formularios
 
             lblStockBajo.Text = $"Stock bajo: {stockBajo}";
             lblStockBajo.ForeColor = stockBajo > 0 ? Color.FromArgb(234, 88, 12) : Color.Black;
+
+            // Actualizar valor monetario total del inventario
+            if (lblValorInventario != null)
+            {
+                decimal valor = CalcularValorInventario();
+                lblValorInventario.Text = $"Valor inventario: S/ {valor:N2}";
+                lblValorInventario.ForeColor = valor > 0 ? Color.FromArgb(20, 83, 45) : Color.Black;
+            }
         }
 
         private void Filtros_Changed(object sender, EventArgs e)
