@@ -289,7 +289,9 @@ namespace TechStore.Formularios
         {
             if (_clienteSeleccionadoId > 0)
             {
-                if (MessageBox.Show($"¿Desea eliminar al cliente {txtNombre.Text}?", "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                var nombreCliente = string.IsNullOrWhiteSpace(txtNombre.Text) ? "este cliente" : txtNombre.Text.Trim();
+                if (MessageBox.Show($"¿Desea eliminar a {nombreCliente}?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes &&
+                    MessageBox.Show($"Se eliminará permanentemente a {nombreCliente}.\n¿Desea continuar?", "Confirmación final", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
                 {
                     try
                     {
