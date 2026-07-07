@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -149,6 +150,26 @@ namespace TechStore.Formularios
             }
 
             if (dgvClientes.Columns["Id"] != null) dgvClientes.Columns["Id"].Visible = false;
+        }
+
+        private void ExportarClientesCsv()
+        {
+            if (dgvClientes.Rows.Count == 0) return;
+
+            string carpetaTemporal = Path.Combine(Path.GetTempPath(), "TechStore");
+            Directory.CreateDirectory(carpetaTemporal);
+            string ruta = Path.Combine(carpetaTemporal, $"clientes_{DateTime.Now:yyyyMMdd_HHmmss}.csv");
+
+            using (var sw = new StreamWriter(ruta))
+            {
+                sw.WriteLine("Id,Nombre,Documento,Telefono,Correo");
+                foreach (DataGridViewRow row in dgvClientes.Rows)
+                {
+                    sw.WriteLine($"{row.Cells["Id"].Value ?? ""},{row.Cells["Nombre"].Value ?? ""},{row.Cells["Documento"].Value ?? ""},{row.Cells["Telefono"].Value ?? ""},{row.Cells["Correo"].Value ?? ""}");
+                }
+            }
+
+            MessageBox.Show($"Archivo exportado en: {ruta}", "Exportación", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void TxtBuscar_TextChanged(object sender, EventArgs e)
