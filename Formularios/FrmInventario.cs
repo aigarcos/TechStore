@@ -80,6 +80,7 @@ namespace TechStore.Formularios
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
             dgvProductos.CellClick += DgvProductos_CellClick;
+            dgvProductos.CellFormatting += DgvProductos_CellFormatting;
             this.Controls.Add(dgvProductos);
 
             // Panel Derecho (Edición)
@@ -221,6 +222,26 @@ namespace TechStore.Formularios
                 lblModoActual.Text = $"Modo: Editando — {txtNombre.Text}";
                 btnEliminar.Enabled = true;
             }
+        }
+
+        private void DgvProductos_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            try
+            {
+                if (e.RowIndex < 0) return;
+                var row = dgvProductos.Rows[e.RowIndex];
+                var cell = row.Cells["Stock"];
+                if (cell?.Value != null && int.TryParse(cell.Value.ToString(), out int stock))
+                {
+                    const int minimoPermitido = 5; // Ajustar según configuración
+                    if (stock < minimoPermitido)
+                    {
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(254, 226, 226);
+                        row.DefaultCellStyle.ForeColor = Color.FromArgb(220, 38, 38);
+                    }
+                }
+            }
+            catch { }
         }
 
         private void BtnNuevo_Click(object sender, EventArgs e)
