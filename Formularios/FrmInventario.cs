@@ -208,6 +208,23 @@ namespace TechStore.Formularios
             }
         }
 
+        // Filtrado rápido por categoría desde código (ej: "Laptops", "Accesorios")
+        public void FiltrarPorCategoria(string categoria)
+        {
+            if (string.IsNullOrWhiteSpace(categoria)) return;
+            for (int i = 0; i < cmbCategoriaFiltro.Items.Count; i++)
+            {
+                if (cmbCategoriaFiltro.Items[i].ToString().Equals(categoria, StringComparison.OrdinalIgnoreCase))
+                {
+                    cmbCategoriaFiltro.SelectedIndex = i;
+                    CargarDatos();
+                    return;
+                }
+            }
+            cmbCategoriaFiltro.SelectedIndex = 0; // "Todos"
+            CargarDatos();
+        }
+
         private void DgvProductos_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex >= 0)
