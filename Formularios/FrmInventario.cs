@@ -319,6 +319,46 @@ namespace TechStore.Formularios
                 var nombreIngresado = txtNombre.Text.Trim();
                 var productosExistentes = _servicioProducto.ObtenerTodos();
 
+                // Verificar duplicados también contra las filas actuales mostradas en el grid
+                foreach (DataGridViewRow r in dgvProductos.Rows)
+                {
+                    if (r.IsNewRow) continue;
+                    var codigoFila = r.Cells["Codigo"]?.Value?.ToString();
+                    var nombreFila = r.Cells["Nombre"]?.Value?.ToString();
+                    int filaId = 0;
+                    if (r.Cells["Id"]?.Value != null) int.TryParse(r.Cells["Id"].Value.ToString(), out filaId);
+
+                    if (_productoSeleccionadoId == 0)
+                    {
+                        if (!string.IsNullOrWhiteSpace(codigoFila) && codigoFila.Equals(codigoIngresado, StringComparison.OrdinalIgnoreCase))
+                        {
+                            MessageBox.Show("El código ingresado ya existe en otro producto (lista mostrada).", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                        if (!string.IsNullOrWhiteSpace(nombreFila) && nombreFila.Equals(nombreIngresado, StringComparison.OrdinalIgnoreCase))
+                        {
+                            MessageBox.Show("El nombre ingresado ya existe en otro producto (lista mostrada).", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        if (filaId != 0 && filaId != _productoSeleccionadoId)
+                        {
+                            if (!string.IsNullOrWhiteSpace(codigoFila) && codigoFila.Equals(codigoIngresado, StringComparison.OrdinalIgnoreCase))
+                            {
+                                MessageBox.Show("El código ingresado ya existe en otro producto (lista mostrada).", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                return;
+                            }
+                            if (!string.IsNullOrWhiteSpace(nombreFila) && nombreFila.Equals(nombreIngresado, StringComparison.OrdinalIgnoreCase))
+                            {
+                                MessageBox.Show("El nombre ingresado ya existe en otro producto (lista mostrada).", "Duplicado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                return;
+                            }
+                        }
+                    }
+                }
+
                 // Verificar duplicados (cuando se crea uno nuevo se compara contra todos,
                 // cuando se edita se excluye el propio registro)
                 if (_productoSeleccionadoId == 0)
