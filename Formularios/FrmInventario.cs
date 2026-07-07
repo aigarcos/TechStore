@@ -290,6 +290,22 @@ namespace TechStore.Formularios
             _productoSeleccionadoId = 0;
             txtCodigo.Text = "";
             txtNombre.Text = "";
+            txtPrecio.Text = "";
+            txtStock.Text = "";
+            lblModoActual.Text = "Modo: Nuevo producto";
+            btnEliminar.Enabled = false;
+        }
+
+        private void BtnGuardar_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text) || string.IsNullOrWhiteSpace(txtNombre.Text))
+            {
+                MessageBox.Show("Código y Nombre son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            try
+            {
                 var codigoIngresado = txtCodigo.Text.Trim();
                 var nombreIngresado = txtNombre.Text.Trim();
                 var productosExistentes = _servicioProducto.ObtenerTodos();
@@ -322,22 +338,7 @@ namespace TechStore.Formularios
                         return;
                     }
                 }
-            txtPrecio.Text = "";
-            txtStock.Text = "";
-            lblModoActual.Text = "Modo: Nuevo producto";
-            btnEliminar.Enabled = false;
-        }
 
-        private void BtnGuardar_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtCodigo.Text) || string.IsNullOrWhiteSpace(txtNombre.Text))
-            {
-                MessageBox.Show("Código y Nombre son obligatorios.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            try
-            {
                 var producto = new Producto
                 {
                     Id = _productoSeleccionadoId,
