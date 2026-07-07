@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using TechStore.Modelos;
 using TechStore.Servicios.Interfaces;
@@ -129,6 +130,11 @@ namespace TechStore.Formularios
             this.Controls.Add(gbHistorial);
         }
 
+        private static bool EsDocumentoValido(string documento)
+        {
+            return !string.IsNullOrWhiteSpace(documento) && Regex.IsMatch(documento, @"^(?:\d{8}|\d{11})$");
+        }
+
         private void CargarClientes()
         {
             var texto = txtBuscar.Text == "Buscar por nombre o DNI..." ? "" : txtBuscar.Text.Trim();
@@ -222,6 +228,13 @@ namespace TechStore.Formularios
             
             txtNombre.BackColor = Color.White;
             txtDocumento.BackColor = Color.White;
+
+            if (!EsDocumentoValido(txtDocumento.Text))
+            {
+                txtDocumento.BackColor = Color.FromArgb(254, 226, 226);
+                MessageBox.Show("El documento debe tener 8 dígitos para DNI o 11 dígitos para RUC.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
             try
             {
